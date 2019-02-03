@@ -6,7 +6,7 @@ class Sender:
         self.sender_client.connect((host, sender_port))
         print("Sender Connected with Channel")
         
-        self.frames = ["Hello", "World"]
+        self.frames = ["Hello", "World", " "]
     
     def send(self):
         for frame in self.frames:
@@ -19,4 +19,4 @@ host = socket.gethostname()
 sender_port = 1234
 sender_obj = Sender(host, sender_port)
 #%%
-sender_obj.send();
+sender_obj.send()

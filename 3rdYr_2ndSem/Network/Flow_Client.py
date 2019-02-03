@@ -1,19 +1,19 @@
-import socket
-import time
-#%%
+import socket               # Import socket module
 
-ip = "127.0.0.1"
-port = 1234
+host = socket.gethostname()  # as both code is running on same pc
+port = 5000  # socket server port number
 
-client_socket = socket.socket()
-client_socket.bind((ip, port))
+client_socket = socket.socket()  # instantiate
+client_socket.connect((host, port))  # connect to the server
 
-#%%
+message = input(" -> ")  # take input
 
-#time.sleep(1)
-client_socket.listen(10)
-client, address = client_socket.accept()
-#%%
-client.send("Hello World".encode())
-#%%
-client_socket.close()
+while message.lower().strip() != 'bye':
+    client_socket.send(message.encode())  # send message
+    data = client_socket.recv(1024).decode()  # receive response
+
+    print('Received from server: ' + data)  # show in terminal
+
+    message = input(" -> ")
+
+client_socket.close()  # close the connection
