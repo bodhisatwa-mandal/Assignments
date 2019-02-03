@@ -1,16 +1,26 @@
-import socket
-import time
-#%%
 
-ip = "127.0.0.1"
-port = 1234
+import socket               # Import socket module
 
-server_socket = socket.socket()
+# get the hostname
+host = socket.gethostname()
+port = 5000  # initiate port no above 1024
 
-#%%
+server_socket = socket.socket()  # get instance
+# look closely. The bind() function takes tuple as argument
+server_socket.bind((host, port))  # bind host address and port together
 
-server_socket.connect((ip, port))
-print(server_socket.recv(1024).decode())
+# configure how many client the server can listen simultaneously
+server_socket.listen(2)
+conn, address = server_socket.accept()  # accept new connection
+print("Connection from: " + str(address))
+while True:
+    # receive data stream. it won't accept data packet greater than 1024 bytes
+    data = conn.recv(1024).decode()
+    if not data:
+        # if data is not received break
+        break
+    print("from connected user: " + str(data))
+    data = input(" -> ")
+    conn.send(data.encode())  # send data to the client
 
-#%%
-server_socket.close()
+conn.close()  # close the connection
