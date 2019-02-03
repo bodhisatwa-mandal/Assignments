@@ -45,4 +45,4 @@ sender_port=1234
 reciever_port=1235
 channel_obj = Channel(host, sender_port, reciever_port)
 #%%
-channel_obj.start_channel
+channel_obj.start_channel()
