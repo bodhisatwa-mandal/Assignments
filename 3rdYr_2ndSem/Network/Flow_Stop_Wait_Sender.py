@@ -13,3 +13,10 @@ class Sender:
             self.sender_client.send(frame.encode())
             ack = self.sender_client.recv(1024).decode()
             print(ack)
+#%%
+
+host = socket.gethostname()
+sender_port = 1234
+sender_obj = Sender(host, sender_port)
+#%%
+sender_obj.send();
