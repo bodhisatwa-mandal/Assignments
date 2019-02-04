@@ -9,18 +9,18 @@ class Reciever:
         self.frames = ["Hello", "World"]
         self.ack = 0
     
-    def send(self):
+    def recieve(self):
         while True:
             data = self.reciever_client.recv(1024).decode()
             if data is " " :
                 break
             print("Data : ", data)
-            self.sender_client.send(str(self.ack).encode())
+            self.reciever_client.send(str(self.ack).encode())
             self.ack += 1
 #%%
 
 host = socket.gethostname()
-reciever_port = 1234
+reciever_port = 1235
 reciever_obj = Reciever(host, reciever_port)
 #%%
-reciever_obj.send()
+reciever_obj.recieve()
