@@ -1,6 +1,14 @@
 import random
 import socket
 import threading
+import time
+#%%
+
+host=socket.gethostname()
+sender_port=1234
+reciever_port=1235
+max_delay = 4
+
 #%%
 class Channel:
     def __init__(self, host=socket.gethostname(), sender_port=1234, reciever_port=1235):
@@ -26,11 +34,13 @@ class Channel:
     def sender_to_reciever(self):
         while True:
             data = self.sender.recv(1024)
+            time.sleep(int(random.random()*max_delay))
             self.reciever.send(data)
         
     def reciever_to_sender(self):
         while True:
             ack = self.reciever.recv(1024)
+            time.sleep(int(random.random()*max_delay))
             self.sender.send(ack)
     
     def start_channel(self):
@@ -40,9 +50,6 @@ class Channel:
         thread_2.start()
     
 #%%
-host=socket.gethostname()
-sender_port=1234
-reciever_port=1235
 channel_obj = Channel(host, sender_port, reciever_port)
 #%%
 channel_obj.start_channel()
