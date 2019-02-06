@@ -93,6 +93,19 @@ class Node
 	}
 }
 
+class DFA_Transition
+{
+	ArrayList<Node> start_state;
+	char transition;
+	ArrayList<Node> final_state;
+	DFA_Transition()
+	{
+		start_state = new ArrayList<Node>();
+		transition = ' ';
+		final_state = new ArrayList<Node>();
+	}
+}
+
 // Class defining Syntax Tree data type
 class SyntaxTree
 {
@@ -100,13 +113,15 @@ class SyntaxTree
 	ArrayList<Node> nodes_list;
 	ArrayList<ArrayList<Node>> followpos_table;
 	int num_terminals;
-
+	ArrayList<DFA_Transition> DTrans;
+	ArratList<ArrayList<Node>> DStates;
 
 	SyntaxTree()
 	{
 		nodes_list = new ArrayList<Node>();
 		num_terminals = 0;
 		followpos_table = new ArrayList<ArrayList<Node>>();
+		DTrans = new ArrayList<DFA_Transition>();
 	}
 
 	// Function to create a Node and add it to tree
@@ -253,6 +268,35 @@ class SyntaxTree
 			for(int j=0; j<followpos_table.get(i).size(); j++)
 				System.out.print(followpos_table.get(i).get(j).id);
 			System.out.println();
+		}
+	}
+
+	void make_DFA()
+	{
+		// Add firstpos of head node
+		DStates.add(head.firstpos);
+		
+		// Add terminal symbols
+		ArrayList<Node> terminals = new ArrayList<Node>();
+		for(int index=0; index<nodes_list.size(); index++)
+			if(nodes_list.get(i).symbol!='*' && nodes_list.get(i).symbol!='|' && nodes_list.get(i).symbol!='&')
+				terminals.add(nodes_list.get(i));
+
+		int state_index=0;
+		while(state_index != DStates.size())
+		{
+			ArrayList<Node> start_symbol = DStates.get(state_index);
+			for(int terminal_index=0; terminal_index<terminals.size(); terminal_index++)
+			{
+				ArrayList<Node> end_symbol = new ArrayList();
+				for(int subsymbol_index=0; subsymbol_index<start_symbol.size(); subsymbol_index++)
+				{
+					if(start_symbol.get(subsymbol_index).id == terminal_symbol.get(terminal_index).id)
+					{
+						
+					}
+				}
+			}
 		}
 	}
 
