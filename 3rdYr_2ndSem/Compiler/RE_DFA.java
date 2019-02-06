@@ -114,7 +114,7 @@ class SyntaxTree
 	ArrayList<ArrayList<Node>> followpos_table;
 	int num_terminals;
 	ArrayList<DFA_Transition> DTrans;
-	ArratList<ArrayList<Node>> DStates;
+	ArrayList<ArrayList<Node>> DStates;
 
 	SyntaxTree()
 	{
@@ -271,16 +271,41 @@ class SyntaxTree
 		}
 	}
 
+	boolean statePresent(ArrayList<Node> end_symbol)
+	{
+		ArrayList<Integer> end_symbol_symbols = new ArrayList<Integer>();
+		for(int i=0; i<end_symbol.size(); i++)
+			end_symbol_symbols.add(end_symbol.get(i).id);
+		for(int state_index=0; state_index<DStates.size(); state_index++)
+		{
+			if(DStates.get(state_index).size()!=end_symbol.size())
+				continue;
+			ArrayList<Integer> DState_symbols = new ArrayList<Integer>();
+			for(int i=0; i<DStates.get(state_index).size(); i++)
+				DState_symbols.add(DStates.get(state_index).get(i).id);
+			int flag=0; // Will be 1 if unknown symbol is present
+			for(int i=0; i<DState_symbols.size(); i++)
+				if(end_symbol_symbols.indexOf(DState_symbols.get(i)) == -1)
+					flag=1;
+			for(int i=0; i<end_symbol_symbols.size(); i++)
+				if(DState_symbols.indexOf(end_symbol_symbols.get(i)) == -1)
+					flag=1;			
+			if(flag == 0)
+				return false;
+		}
+		return true;
+	}
+
 	void make_DFA()
 	{
 		// Add firstpos of head node
 		DStates.add(head.firstpos);
 		
 		// Add terminal symbols
-		ArrayList<Node> terminals = new ArrayList<Node>();
-		for(int index=0; index<nodes_list.size(); index++)
-			if(nodes_list.get(i).symbol!='*' && nodes_list.get(i).symbol!='|' && nodes_list.get(i).symbol!='&')
-				terminals.add(nodes_list.get(i));
+		ArrayList<Character> terminals = new ArrayList<Character>();
+		for(int i=0; i<nodes_list.size(); i++)
+			if(nodes_list.get(i).symbol!='*' && nodes_list.get(i).symbol!='|' && nodes_list.get(i).symbol!='&' && nodes_list.get(i).symbol!='#' && terminals.indexOf(nodes_list.get(i).symbol)==-1)
+				terminals.add(nodes_list.get(i).symbol);
 
 		int state_index=0;
 		while(state_index != DStates.size())
@@ -291,11 +316,24 @@ class SyntaxTree
 				ArrayList<Node> end_symbol = new ArrayList();
 				for(int subsymbol_index=0; subsymbol_index<start_symbol.size(); subsymbol_index++)
 				{
-					if(start_symbol.get(subsymbol_index).id == terminal_symbol.get(terminal_index).id)
+					if(start_symbol.get(subsymbol_index).symbol == terminals.get(terminal_index))
 					{
-						
+						int followpos_table_index=0;
+						for(followpos_table_index=0; followpos_table_index<followpos_table.size(); followpos_table_index++)
+							if(followpos_table.get(followpos_table_index).get(0).id == start_symbol.get(subsymbol_index).id)
+								break;
+						for(int i=1; i<followpos_table.get(followpos_table_index).size(); i++)
+							if(end_symbol.indexOf(followpos_table.get(followpos_table_index).get(i)) == -1)
+								end_symbol.add(followpos_table.get(followpos_table_index).get(i));
 					}
 				}
+				DFA_Transition temp_trans = new DFA_Transition();
+				temp_trans.start_state = start_symbol;
+				temp_trans.transition = terminals.get(terminal_index).charValue();
+				temp_trans.final_state = end_symbol;
+				DTrans.add(temp_trans);
+				if(statePresent(end_symbol))
+					DStates.add(end_symbol);
 			}
 		}
 	}
