@@ -298,6 +298,7 @@ class SyntaxTree
 
 	void make_DFA()
 	{
+		DStates = new ArrayList<ArrayList<Node>>();
 		// Add firstpos of head node
 		DStates.add(head.firstpos);
 		
@@ -313,7 +314,7 @@ class SyntaxTree
 			ArrayList<Node> start_symbol = DStates.get(state_index);
 			for(int terminal_index=0; terminal_index<terminals.size(); terminal_index++)
 			{
-				ArrayList<Node> end_symbol = new ArrayList();
+				ArrayList<Node> end_symbol = new ArrayList<Node>();
 				for(int subsymbol_index=0; subsymbol_index<start_symbol.size(); subsymbol_index++)
 				{
 					if(start_symbol.get(subsymbol_index).symbol == terminals.get(terminal_index))
@@ -327,14 +328,18 @@ class SyntaxTree
 								end_symbol.add(followpos_table.get(followpos_table_index).get(i));
 					}
 				}
-				DFA_Transition temp_trans = new DFA_Transition();
-				temp_trans.start_state = start_symbol;
-				temp_trans.transition = terminals.get(terminal_index).charValue();
-				temp_trans.final_state = end_symbol;
-				DTrans.add(temp_trans);
-				if(statePresent(end_symbol))
-					DStates.add(end_symbol);
+				if(end_symbol.size() != 0)
+				{
+					DFA_Transition temp_trans = new DFA_Transition();
+					temp_trans.start_state = start_symbol;
+					temp_trans.transition = terminals.get(terminal_index).charValue();
+					temp_trans.final_state = end_symbol;
+					DTrans.add(temp_trans);
+					if(statePresent(end_symbol))
+						DStates.add(end_symbol);
+				}
 			}
+			state_index++;
 		}
 	}
 
@@ -345,9 +350,9 @@ class SyntaxTree
 		{
 			for(int start_index=0; start_index<DTrans.get(dfa_index).start_state.size(); start_index++)
 				System.out.print(DTrans.get(dfa_index).start_state.get(start_index).id+" ");
-			System.out.print(" ; ");
-			for(int end_index=0; end_index<DTrans.get(dfa_index).end_state.size(); end_index++)
-				System.out.print(" "+DTrans.get(dfa_index).end_state.get(end_index).id);
+			System.out.print(" : "+DTrans.get(dfa_index).transition+" : ");
+			for(int end_index=0; end_index<DTrans.get(dfa_index).final_state.size(); end_index++)
+				System.out.print(" "+DTrans.get(dfa_index).final_state.get(end_index).id);
 			System.out.println();
 		}
 	}
@@ -359,6 +364,7 @@ class SyntaxTree
 		make_followpos_table();
 		print_followpos_table();
 		make_DFA();
+		print_DFA();
 	}
 }
 
@@ -368,7 +374,7 @@ class RE_DFA
 	{
 		InfixtoPostfix obj = new InfixtoPostfix();
 		SyntaxTree tree = new SyntaxTree();
-		String infix = "z&(a|b)*&y&#";
+		String infix = "a&(b|c)*&d&#";
 		String postfix = obj.exp_convert(infix);
 		System.out.println(postfix);
 		tree.build(postfix);
