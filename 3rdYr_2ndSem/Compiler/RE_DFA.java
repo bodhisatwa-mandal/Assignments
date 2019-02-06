@@ -338,12 +338,27 @@ class SyntaxTree
 		}
 	}
 
+	void print_DFA()
+	{
+		System.out.println();
+		for(int dfa_index=0; dfa_index<DTrans.size(); dfa_index++)
+		{
+			for(int start_index=0; start_index<DTrans.get(dfa_index).start_state.size(); start_index++)
+				System.out.print(DTrans.get(dfa_index).start_state.get(start_index).id+" ");
+			System.out.print(" ; ");
+			for(int end_index=0; end_index<DTrans.get(dfa_index).end_state.size(); end_index++)
+				System.out.print(" "+DTrans.get(dfa_index).end_state.get(end_index).id);
+			System.out.println();
+		}
+	}
+
 	void build(String postfix)
 	{
 		make_tree(postfix);
 		print_tree();
 		make_followpos_table();
 		print_followpos_table();
+		make_DFA();
 	}
 }
 
