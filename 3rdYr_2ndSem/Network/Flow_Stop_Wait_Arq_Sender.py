@@ -14,7 +14,8 @@ class Sender:
         time.sleep(2)
         for frame in self.frames:
             while True:
-                print("Sending Frame : ", frame)
+                if frame != " ":
+                    print("Sending Frame : ", frame)
                 self.sender_client.send(frame.encode())
                 if frame is " ":
                     break
