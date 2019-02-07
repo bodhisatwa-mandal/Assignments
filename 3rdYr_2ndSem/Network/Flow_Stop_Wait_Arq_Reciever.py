@@ -4,10 +4,8 @@ class Reciever:
     def __init__(self, host=socket.gethostname(), reciever_port=1234):
         self.reciever_client = socket.socket()
         self.reciever_client.connect((host, reciever_port))
+        self.frame_id = 0
         print("Reciever Connected with Channel")
-        
-        self.frames = ["Hello", "World"]
-        self.ack = 0
     
     def recieve(self):
         while True:
@@ -15,8 +13,13 @@ class Reciever:
             if data is " " :
                 break
             print("Data : ", data)
-            self.reciever_client.send(str(self.ack).encode())
-            self.ack += 1
+            if int(data) is self.frame_id:
+                print("Sending Acknowledgement : ",self.frame_id)      
+                self.reciever_client.send(str(self.frame_id).encode())
+                self.frame_id += 1
+            elif int(data) is self.frame_id-1:
+                print("Sending Acknowledgement : ",self.frame_id-1)      
+                self.reciever_client.send(str(self.frame_id-1).encode())
 #%%
 
 host = socket.gethostname()
