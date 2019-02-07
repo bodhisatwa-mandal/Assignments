@@ -1,6 +1,7 @@
 
 import java.util.Stack;
 import java.util.ArrayList;
+import java.io.*;
 
 class InfixtoPostfix
 {
@@ -17,9 +18,44 @@ class InfixtoPostfix
 		    return -1; 
 	}
 
+	// Function to add '&' and '#'
+	String addConcat(String input)
+	{
+		String output = ""+input.charAt(0);
+		for(int i=1; i<input.length(); i++)
+		{
+			if(input.charAt(i) == ':')
+			{
+				int ch = (int)(output.charAt(output.length()-1));
+				ch++;
+				while((char)(ch) != input.charAt(i+1))
+					output += "&"+(char)(ch++);
+				output += "&"+input.charAt(++i);
+			}
+			else if(input.charAt(i) == ';')
+			{
+				int ch = (int)(output.charAt(output.length()-1));
+				ch++;
+				while((char)(ch) != input.charAt(i+1))
+					output += "|"+(char)(ch++);
+				output += "|"+input.charAt(++i);
+			}
+			else
+			{
+				if(output.charAt(output.length()-1) != '(' && input.charAt(i) != ')' && input.charAt(i) != '*' && input.charAt(i) != '|' && output.charAt(output.length()-1) != '|')
+					output += "&";
+				output+=input.charAt(i);
+			}
+		}
+		output += "&#";
+		return output;
+	}
+
 	// Function to convert infix expression to postfix
 	String exp_convert(String infix)
 	{
+		infix = addConcat(infix);
+		System.out.println("After adding concat symbol : "+infix);
 		Stack<Character> conversion_stack = new Stack<Character>();
 		conversion_stack.push('$');
 		int infix_length = infix.length();
@@ -29,7 +65,7 @@ class InfixtoPostfix
 		for(int infix_index = 0; infix_index < infix_length; infix_index++)
 		{
 			// If the scanned character is an operand, add it to output string. 
-        	if((infix.charAt(infix_index) >= 'a' && infix.charAt(infix_index) <= 'z')||(infix.charAt(infix_index) >= 'A' && infix.charAt(infix_index) <= 'Z')||(infix.charAt(infix_index) == '#')) 
+        	if((infix.charAt(infix_index) >= 'a' && infix.charAt(infix_index) <= 'z')||(infix.charAt(infix_index) >= 'A' && infix.charAt(infix_index) <= 'Z')||(infix.charAt(infix_index) >= '0' && infix.charAt(infix_index) <= '9')||(infix.charAt(infix_index) == '#')) 
         		postfix+=infix.charAt(infix_index); 
 
         	// If the scanned character is an ‘(‘, push it to the stack. 
@@ -96,7 +132,7 @@ class Node
 class DFA_Transition
 {
 	ArrayList<Node> start_state;
-	char transition;
+	char transition;ArrayList<DFA_Transition> DTrans;
 	ArrayList<Node> final_state;
 	DFA_Transition()
 	{
@@ -132,7 +168,6 @@ class SyntaxTree
 		new_node.symbol = ch;
 		new_node.id = nodes_list.size();
 		new_node.nullable = ch=='*';
-		nodes_list.add(new_node);
 		return new_node;
 	}
 
@@ -160,6 +195,7 @@ class SyntaxTree
 					new_node.lastpos.add(popped_node.lastpos.get(lastpos_index));
 				stack.push(new_node);
 				head = new_node;
+				nodes_list.add(new_node);
 			}
 			else if(symbol == '|')
 			{
@@ -180,6 +216,7 @@ class SyntaxTree
 					new_node.lastpos.add(child_2.lastpos.get(lastpos_index));
 				stack.push(new_node);
 				head = new_node;
+				nodes_list.add(new_node);
 			}
 			else if(symbol == '&')
 			{
@@ -202,6 +239,7 @@ class SyntaxTree
 					new_node.lastpos.add(child_2.lastpos.get(lastpos_index));
 				stack.push(new_node);
 				head = new_node;
+				nodes_list.add(new_node);
 			}
 			else// if(isTerminal(symbol))
 			{
@@ -213,6 +251,7 @@ class SyntaxTree
 				ArrayList<Node> temp = new ArrayList<Node>();
 				temp.add(new_node);
 				followpos_table.add(temp);
+				nodes_list.add(new_node);
 			}
 		}
 	}
@@ -246,29 +285,57 @@ class SyntaxTree
 
 	void print_tree()
 	{
+		System.out.println();
+		System.out.println("========================");
+		System.out.println("|    Nodes of Tree     |");
+		System.out.println("========================");
+
 		for(int index=0; index<nodes_list.size(); index++)
 		{
-			System.out.println(nodes_list.get(index).symbol);
-			System.out.println(nodes_list.get(index).id);
-			System.out.println(nodes_list.get(index).nullable);
+			System.out.println();
+			System.out.println("Symbol   : "+nodes_list.get(index).symbol);
+			System.out.println("ID       : "+nodes_list.get(index).id);
+			System.out.print("Parent   : ");
+			if(nodes_list.get(index).parent != null)
+				System.out.println(nodes_list.get(index).parent.id);
+			else
+				System.out.println("None");
+			
+			if(nodes_list.get(index).symbol == '*')
+				System.out.println("Child  : "+nodes_list.get(index).first.id);
+			else if(nodes_list.get(index).first != null)
+				System.out.println("Children : "+nodes_list.get(index).first.id+','+nodes_list.get(index).second.id);
+			
+			System.out.println("Nullable : "+nodes_list.get(index).nullable);
+			System.out.print("Firstpos : [");
 			for(int i=0; i<nodes_list.get(index).firstpos.size(); i++)
-				System.out.print(nodes_list.get(index).firstpos.get(i).id);
-			System.out.println();
+				System.out.print(nodes_list.get(index).firstpos.get(i).id+" ");
+			System.out.println("]");
+			System.out.print("Lastpos  : [");
 			for(int i=0; i<nodes_list.get(index).lastpos.size(); i++)
-				System.out.print(nodes_list.get(index).lastpos.get(i).id);
-			System.out.println();
-			System.out.println();
+				System.out.print(nodes_list.get(index).lastpos.get(i).id+" ");
+			System.out.println("]");
 		}
+		System.out.println();
+		System.out.println("========================");
+		System.out.println();
 	}
 
 	void print_followpos_table()
 	{
+		System.out.println();
+		System.out.println("===================================");
+		System.out.println("|         Followpos Table         |");
+		System.out.println("===================================");
 		for(int i=0; i<followpos_table.size(); i++)
 		{
-			for(int j=0; j<followpos_table.get(i).size(); j++)
-				System.out.print(followpos_table.get(i).get(j).id);
-			System.out.println();
+			System.out.print("\t"+followpos_table.get(i).get(0).id + "\t: [");
+			for(int j=1; j<followpos_table.get(i).size(); j++)
+				System.out.print(followpos_table.get(i).get(j).id+" ");
+			System.out.println("]");
 		}
+		System.out.println("===================================");
+		System.out.println();
 	}
 
 	boolean statePresent(ArrayList<Node> end_symbol)
@@ -345,16 +412,55 @@ class SyntaxTree
 
 	void print_DFA()
 	{
+		ArrayList<ArrayList<Node>> final_states= new ArrayList<ArrayList<Node>>();
 		System.out.println();
+		System.out.println("=================================================================================");
+		System.out.println("|                               Transition Table                                |");
+		System.out.println("=================================================================================");
+		System.out.println("\tStart State\t|\tTransition Symbol\t|\tEnd State\t");
+		System.out.println("------------------------|-------------------------------|------------------------");
+
 		for(int dfa_index=0; dfa_index<DTrans.size(); dfa_index++)
 		{
+			System.out.print("\t(");
 			for(int start_index=0; start_index<DTrans.get(dfa_index).start_state.size(); start_index++)
 				System.out.print(DTrans.get(dfa_index).start_state.get(start_index).id+" ");
-			System.out.print(" : "+DTrans.get(dfa_index).transition+" : ");
+			if(DTrans.get(dfa_index).start_state.size() < 4)
+				System.out.print("\t");
+			System.out.print(")\t|\t\t"+DTrans.get(dfa_index).transition+"\t\t|\t(");
+			int flag=0;
 			for(int end_index=0; end_index<DTrans.get(dfa_index).final_state.size(); end_index++)
+			{
 				System.out.print(" "+DTrans.get(dfa_index).final_state.get(end_index).id);
-			System.out.println();
+				if(DTrans.get(dfa_index).final_state.get(end_index).id == nodes_list.get(nodes_list.size()-2).id)
+					flag=1;
+			}
+			System.out.println(")");
+			if(flag==1)
+				final_states.add(DTrans.get(dfa_index).final_state);
 		}
+		System.out.println("=================================================================================");
+		System.out.println();
+		System.out.print("Start Symbol : (");
+		for(int index=0; index<DStates.get(0).size(); index++)
+			System.out.print(DStates.get(0).get(index).id + " ");
+		System.out.println(")");
+		if(final_states.size() == 0)
+			System.out.println("There is no reachable final state");
+		else
+		{
+			System.out.print("Reachable final states : ");
+			for(int final_state_index=0; final_state_index<final_states.size(); final_state_index++)
+			{
+				System.out.print("(");
+				for(int state_index=0; state_index<final_states.get(final_state_index).size(); state_index++)
+					System.out.print(final_states.get(final_state_index).get(state_index).id+" ");
+				System.out.print(") ");
+				if(final_state_index != final_states.size()-1)
+					System.out.print(",");
+			}
+		}
+		System.out.println();
 	}
 
 	void build(String postfix)
@@ -366,17 +472,24 @@ class SyntaxTree
 		make_DFA();
 		print_DFA();
 	}
+
 }
 
 class RE_DFA
 {
-	public static void main(String args[])
+	public static void main(String args[])throws IOException
 	{
 		InfixtoPostfix obj = new InfixtoPostfix();
 		SyntaxTree tree = new SyntaxTree();
-		String infix = "a&(b|c)*&d&#";
+		//String infix = "(a|b)*&a&b&b&#";
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("Enter expression");
+		//String infix = "(a|b)*abb";
+		String infix = br.readLine();
 		String postfix = obj.exp_convert(infix);
-		System.out.println(postfix);
+		System.out.println();
+		System.out.println("Expression in Postfix : "+postfix);
+		System.out.println();
 		tree.build(postfix);
 	}
 }
