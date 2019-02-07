@@ -1,0 +1,165 @@
+Enter expression
+z(a|e|i|o|u)*0
+After adding concat symbol : z&(a|e|i|o|u)*&0&#
+
+Expression in Postfix : zae|i|o|u|*&0&#&
+
+
+========================
+|    Nodes of Tree     |
+========================
+
+Symbol   : z
+ID       : 0
+Parent   : 11
+Nullable : false
+Firstpos : [0 ]
+Lastpos  : [0 ]
+
+Symbol   : a
+ID       : 1
+Parent   : 3
+Nullable : false
+Firstpos : [1 ]
+Lastpos  : [1 ]
+
+Symbol   : e
+ID       : 2
+Parent   : 3
+Nullable : false
+Firstpos : [2 ]
+Lastpos  : [2 ]
+
+Symbol   : |
+ID       : 3
+Parent   : 5
+Children : 1,2
+Nullable : false
+Firstpos : [1 2 ]
+Lastpos  : [1 2 ]
+
+Symbol   : i
+ID       : 4
+Parent   : 5
+Nullable : false
+Firstpos : [4 ]
+Lastpos  : [4 ]
+
+Symbol   : |
+ID       : 5
+Parent   : 7
+Children : 3,4
+Nullable : false
+Firstpos : [1 2 4 ]
+Lastpos  : [1 2 4 ]
+
+Symbol   : o
+ID       : 6
+Parent   : 7
+Nullable : false
+Firstpos : [6 ]
+Lastpos  : [6 ]
+
+Symbol   : |
+ID       : 7
+Parent   : 9
+Children : 5,6
+Nullable : false
+Firstpos : [1 2 4 6 ]
+Lastpos  : [1 2 4 6 ]
+
+Symbol   : u
+ID       : 8
+Parent   : 9
+Nullable : false
+Firstpos : [8 ]
+Lastpos  : [8 ]
+
+Symbol   : |
+ID       : 9
+Parent   : 10
+Children : 7,8
+Nullable : false
+Firstpos : [1 2 4 6 8 ]
+Lastpos  : [1 2 4 6 8 ]
+
+Symbol   : *
+ID       : 10
+Parent   : 11
+Child  : 9
+Nullable : true
+Firstpos : [1 2 4 6 8 ]
+Lastpos  : [1 2 4 6 8 ]
+
+Symbol   : &
+ID       : 11
+Parent   : 13
+Children : 0,10
+Nullable : false
+Firstpos : [0 ]
+Lastpos  : [0 1 2 4 6 8 ]
+
+Symbol   : 0
+ID       : 12
+Parent   : 13
+Nullable : false
+Firstpos : [12 ]
+Lastpos  : [12 ]
+
+Symbol   : &
+ID       : 13
+Parent   : 15
+Children : 11,12
+Nullable : false
+Firstpos : [0 ]
+Lastpos  : [12 ]
+
+Symbol   : #
+ID       : 14
+Parent   : 15
+Nullable : false
+Firstpos : [14 ]
+Lastpos  : [14 ]
+
+Symbol   : &
+ID       : 15
+Parent   : None
+Children : 13,14
+Nullable : false
+Firstpos : [0 ]
+Lastpos  : [14 ]
+
+========================
+
+
+===================================
+|         Followpos Table         |
+===================================
+        0       : [1 2 4 6 8 12 ]
+        1       : [1 2 4 6 8 12 ]
+        2       : [1 2 4 6 8 12 ]
+        4       : [1 2 4 6 8 12 ]
+        6       : [1 2 4 6 8 12 ]
+        8       : [1 2 4 6 8 12 ]
+        12      : [14 ]
+        14      : []
+===================================
+
+
+=================================================================================
+|                               Transition Table                                |
+=================================================================================
+        Start State     |       Transition Symbol       |       End State
+------------------------|-------------------------------|------------------------
+        (0      )       |               z               |       ( 1 2 4 6 8 12)
+        (1 2 4 6 8 12 ) |               a               |       ( 1 2 4 6 8 12)
+        (1 2 4 6 8 12 ) |               e               |       ( 1 2 4 6 8 12)
+        (1 2 4 6 8 12 ) |               i               |       ( 1 2 4 6 8 12)
+        (1 2 4 6 8 12 ) |               o               |       ( 1 2 4 6 8 12)
+        (1 2 4 6 8 12 ) |               u               |       ( 1 2 4 6 8 12)
+        (1 2 4 6 8 12 ) |               0               |       ( 14)
+=================================================================================
+
+Start Symbol : (0 )
+Reachable final states : (14 ) 
+

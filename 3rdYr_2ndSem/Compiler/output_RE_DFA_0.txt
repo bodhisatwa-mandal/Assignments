@@ -1,0 +1,134 @@
+ 
+Enter expression
+(a|b)*abb
+After adding concat symbol : (a|b)*&a&b&b&#
+
+Expression in Postfix : ab|*a&b&b&#&
+
+
+========================
+|    Nodes of Tree     |
+========================
+
+Symbol   : a
+ID       : 0
+Parent   : 2
+Nullable : false
+Firstpos : [0 ]
+Lastpos  : [0 ]
+
+Symbol   : b
+ID       : 1
+Parent   : 2
+Nullable : false
+Firstpos : [1 ]
+Lastpos  : [1 ]
+
+Symbol   : |
+ID       : 2
+Parent   : 3
+Children : 0,1
+Nullable : false
+Firstpos : [0 1 ]
+Lastpos  : [0 1 ]
+
+Symbol   : *
+ID       : 3
+Parent   : 5
+Child  : 2
+Nullable : true
+Firstpos : [0 1 ]
+Lastpos  : [0 1 ]
+
+Symbol   : a
+ID       : 4
+Parent   : 5
+Nullable : false
+Firstpos : [4 ]
+Lastpos  : [4 ]
+
+Symbol   : &
+ID       : 5
+Parent   : 7
+Children : 3,4
+Nullable : false
+Firstpos : [0 1 4 ]
+Lastpos  : [4 ]
+
+Symbol   : b
+ID       : 6
+Parent   : 7
+Nullable : false
+Firstpos : [6 ]
+Lastpos  : [6 ]
+
+Symbol   : &
+ID       : 7
+Parent   : 9
+Children : 5,6
+Nullable : false
+Firstpos : [0 1 4 ]
+Lastpos  : [6 ]
+
+Symbol   : b
+ID       : 8
+Parent   : 9
+Nullable : false
+Firstpos : [8 ]
+Lastpos  : [8 ]
+
+Symbol   : &
+ID       : 9
+Parent   : 11
+Children : 7,8
+Nullable : false
+Firstpos : [0 1 4 ]
+Lastpos  : [8 ]
+
+Symbol   : #
+ID       : 10
+Parent   : 11
+Nullable : false
+Firstpos : [10 ]
+Lastpos  : [10 ]
+
+Symbol   : &
+ID       : 11
+Parent   : None
+Children : 9,10
+Nullable : false
+Firstpos : [0 1 4 ]
+Lastpos  : [10 ]
+
+========================
+
+
+===================================
+|         Followpos Table         |
+===================================
+        0       : [0 1 4 ]
+        1       : [0 1 4 ]
+        4       : [6 ]
+        6       : [8 ]
+        8       : [10 ]
+        10      : []
+===================================
+
+
+=================================================================================
+|                               Transition Table                                |
+=================================================================================
+        Start State     |       Transition Symbol       |       End State
+------------------------|-------------------------------|------------------------
+        (0 1 4  )       |               a               |       ( 0 1 4 6)
+        (0 1 4  )       |               b               |       ( 0 1 4)
+        (0 1 4 6 )      |               a               |       ( 0 1 4 6)
+        (0 1 4 6 )      |               b               |       ( 0 1 4 8)
+        (0 1 4 8 )      |               a               |       ( 0 1 4 6)
+        (0 1 4 8 )      |               b               |       ( 0 1 4 10)
+        (0 1 4 10 )     |               a               |       ( 0 1 4 6)
+        (0 1 4 10 )     |               b               |       ( 0 1 4)
+=================================================================================
+
+Start Symbol : (0 1 4 )
+Reachable final states : (0 1 4 10 ) 
