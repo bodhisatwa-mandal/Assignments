@@ -7,7 +7,7 @@ import time
 host=socket.gethostname()
 sender_port=1234
 reciever_port=1235
-max_delay = 0
+max_delay = 3
 
 #%%
 class Channel:

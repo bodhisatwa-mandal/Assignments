@@ -8,7 +8,7 @@ class Sender:
         self.sender_client = socket.socket()
         self.sender_client.connect((host, sender_port))
         self.sender_client.settimeout(2)
-        self.timer_threshold = 5
+        self.timer_threshold =3
         print("Sender Connected with Channel")
         self.data_id = 0
         self.ack_id = 0
@@ -17,7 +17,7 @@ class Sender:
         
     def recieve(self):
         while True:
-            if self.ack_id is len(self.frames):
+            if self.ack_id is len(self.frames)-1:
                 break
             try:
                 ack = self.sender_client.recv(1024).decode()
@@ -28,13 +28,11 @@ class Sender:
                 continue
             if int(ack) == self.ack_id:
                 self.ack_id += 1
+                print(self.ack_id)
                 
     def send(self):
         while True:
-            print(self.ack_id)
-            if self.ack_id == len(self.frames)-1:
-                break
-            elif self.data_id == self.ack_id:
+            if self.data_id == self.ack_id:
                 if not (self.frames[self.data_id] == " "):
                     print("Sending Frame : ",self.frames[self.data_id])
                 self.sender_client.send(self.frames[self.data_id].encode())
@@ -42,7 +40,8 @@ class Sender:
                 if self.frames[self.data_id] is " ":
                     return
                 self.data_id += 1
-            
+            if self.ack_id == len(self.frames)-1:
+                break
             elif time.time()-self.sent_time > self.timer_threshold:
                 print("Sending Frame : ",self.frames[self.data_id-1])
                 self.sender_client.send(self.frames[self.data_id-1].encode())
