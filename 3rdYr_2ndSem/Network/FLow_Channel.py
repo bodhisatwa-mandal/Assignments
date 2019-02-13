@@ -36,7 +36,14 @@ class Channel:
     def sender_to_buffer(self):
         while True:
             data = self.sender.recv(1024)
-            self.data_buffer.append(data.decode())
+            string = data.decode()
+            if string != " " and len(self.data_buffer)>0 and int(self.data_buffer[-1]) > int(string[0:2]):
+                self.data_buffer=list(map(''.join, zip(*[iter(string)]*2)))
+            else:
+                self.data_buffer+=list(map(''.join, zip(*[iter(string)]*2)))
+            if len(string)!=0 and string[-1] == " ":
+                self.data_buffer.append(" ")
+            print('data',self.data_buffer)
     
     def buffer_to_reciever(self):
         while True:
@@ -48,8 +55,13 @@ class Channel:
     def reciever_to_buffer(self):
         while True:
             ack = self.reciever.recv(1024)
-            self.ack_buffer.append(ack.decode())
-            
+            string = ack.decode()
+            if len(self.ack_buffer)>0 and len(string)>0 and int(self.ack_buffer[-1]) > int(string[0:2]):
+                self.ack_buffer=list(map(''.join, zip(*[iter(string)]*2)))
+            else:
+                self.ack_buffer+=list(map(''.join, zip(*[iter(string)]*2)))
+            print('ack',self.ack_buffer)
+
     def buffer_to_sender(self):
         while True:
             if len(self.ack_buffer) != 0:
