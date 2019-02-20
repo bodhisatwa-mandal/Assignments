@@ -30,7 +30,7 @@ class Reciever:
 
 host = socket.gethostname()
 reciever_port = 1235
-frame_len = 4
+frame_len = 3
 reciever_obj = Reciever(host, reciever_port, frame_len)
 #%%
 reciever_obj.recieve()

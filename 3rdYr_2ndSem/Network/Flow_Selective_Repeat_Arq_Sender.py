@@ -12,16 +12,18 @@ class Sender:
         print("Sender Connected with Channel")
 
         self.sent_time = []
+        self.sender_window = [False]*frame_len
+        self.ack_id = 0
 
         self.S_b = 0
         self.S_w = frame_len
         self.S_n = 0
 
-        self.frames = ["00", "01", "02", "03", "04", " "]
+        self.frames = ["00", "01", "02", "03", "04", "05", " "]
         
     def recieve(self):
         while True:
-            if self.S_b == len(self.frames)-1:
+            if self.ack_id == len(self.frames)-1:
                 break
             try:
                 ack = self.sender_client.recv(1024).decode()
@@ -30,8 +32,12 @@ class Sender:
                 ack = None
             if ack is None:
                 continue
-            if int(ack) == self.S_b:
-                self.S_b += 1
+            if int(ack) >= self.ack_id:
+                recieved_id = int(data)
+                self.sender_window[recieved_id%self.frame_len] = True
+                if not False in self.sender_window:
+                    self.sender_window = [False]*frame_len
+                    self.ack_id += self.frame_len
                 
     def send(self):
         while True:
@@ -64,7 +70,7 @@ class Sender:
 
 host = socket.gethostname()
 sender_port = 1234
-frame_len = 4
+frame_len = 3
 sender_obj = Sender(host, sender_port, frame_len)
 #%%
 sender_obj.drive()
