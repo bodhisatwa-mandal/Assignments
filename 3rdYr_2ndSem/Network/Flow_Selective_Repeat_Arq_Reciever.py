@@ -6,7 +6,7 @@ class Reciever:
         self.reciever_client.connect((host, reciever_port))
         self.frame_id = 0
         self.frame_len = frame_len
-        self.recieved = [False]*frame_len
+        self.recieve_window = [False]*frame_len
         print("Reciever Connected with Channel")
     
     def recieve(self):
@@ -14,19 +14,18 @@ class Reciever:
             data = self.reciever_client.recv(1024).decode()
             if data is " " :
                 break
-            if int(data)<self.frame_id:
-                self.frame_id = int(data)
-            print("Data : ", data)
-            if int(data) is self.frame_id:
+            if int(data)>=self.frame_id:
+                recieved_id = int(data)
+                self.recieve_window[recieved_id%self.frame_len] = True
+                print("Data : ", data)
                 print("Sending Acknowledgement : ",self.frame_id)
-                ack = str(self.frame_id)
-                if len(ack) == 1:
-                    ack = "0"+ack
-                self.reciever_client.send(ack.encode())
-                self.frame_id += 1
-            elif int(data) is self.frame_id-1:
-                print("Sending Acknowledgement : ",self.frame_id-1)      
-                self.reciever_client.send(str(self.frame_id-1).encode())
+                self.reciever_client.send(data.encode())
+                if not False in self.recieve_window:
+                    self.recieve_window = [False]*frame_len
+                    self.frame_id += self.frame_len
+            elif int(data) < self.frame_id:
+                print("Sending Acknowledgement : ",data)
+                self.reciever_client.send(data.encode())
 #%%
 
 host = socket.gethostname()
