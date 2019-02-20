@@ -52,14 +52,6 @@ class Sender:
                         print("Resending Frame : ",self.frames[send_id])
                         self.sender_client.send(self.frames[self.send_id].encode())
                         self.sent_timer[send_id] = time.time()
-                if self.S_n != len(self.frames):
-                    self.S_n += 1
-            if (len(self.sent_time)!=0) and (time.time()-self.sent_time[0]>self.timer_threshold):
-                for i in range(self.S_b, self.S_n, 1):
-                    del self.sent_time[0]
-                    print("Sending Frame : ",self.frames[i])
-                    self.sender_client.send(self.frames[i].encode())
-                    self.sent_time.append(time.time())
 
     def drive(self):
         thread_1 = threading.Thread(target=self.send, args=())
