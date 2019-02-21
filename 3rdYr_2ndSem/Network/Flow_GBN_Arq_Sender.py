@@ -49,7 +49,7 @@ class Sender:
             if (len(self.sent_time)!=0) and (time.time()-self.sent_time[0]>self.timer_threshold):
                 for i in range(self.S_b, self.S_n, 1):
                     del self.sent_time[0]
-                    print("Sending Frame : ",self.frames[i])
+                    print("Resending Frame : ",self.frames[i])
                     self.sender_client.send(self.frames[i].encode())
                     self.sent_time.append(time.time())
 
