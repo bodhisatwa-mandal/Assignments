@@ -1,0 +1,61 @@
+Assignment Part 1:
+
+INPUT:
+I am 123 43.23
+he is 12.32 3
+& * ##
+
+OUTPUT:
+Character Count      : 7
+Word Count           : 11
+Line Count           : 3
+Number Count         : 12
+Integer Count        : 2
+Floating-point Count : 2
+Unknown Count        : 4
+
+
+
+
+
+
+
+
+Assignment Part 2
+
+INPUT:
+#include <stdio.h>
+int main()
+{
+        int a = 123;
+        printf("Hello World\n");
+        return 0;
+}
+
+OUTPUT:
+include ID      1       0
+<       Special 9       0
+stdio   ID      10      0
+h       ID      16      0
+>       Special 17      0
+int     Keyword 0       1
+main    ID      4       1
+(       Special 8       1
+)       Special 9       1
+{       Special 0       2
+int     Keyword 1       3
+a       ID      5       3
+=       Special 7       3
+123     NUM     9       3
+;       Special 12      3
+printf  ID      1       4
+(       Special 7       4
+Hello   ID      9       4
+World   ID      15      4
+n       ID      21      4
+)       Special 23      4
+;       Special 24      4
+return  Keyword 1       5
+0       NUM     8       5
+;       Special 9       5
+}       Special 0       6
