@@ -3,6 +3,7 @@ import time
 import random
 import threading
 import socket
+import re
 #%%
 class Node:
     def __init__(self, node_id, num_nodes, host=socket.gethostname()):
@@ -21,7 +22,7 @@ class Node:
         self.can_send = False
 
         self.frames = ['Hello', 'World', '#']
-        self.p = 0.15
+        self.p = 1
 
         self.wait_time = random.random()
         self.increment_waitimg_time = random.random()
@@ -54,10 +55,19 @@ class Node:
     def recieveData(self):
         while True:
             try:
+                string = ''
                 data = self.data_recieve_socket.recv(1024).decode()
                 if data != '':
-                    print("Data Recieved : ", data)
-            except:
+                    for ch in range(len(data)):
+                        if data[ch].isdigit():
+                            if ch!=0:
+                                print("Received Data : ",string)
+                            string = str(data[ch])
+                        else:
+                            string = string+str(data[ch])
+                    print("Received Data : ", string)
+            except Exception as e:
+                print(e)
                 pass
 
 

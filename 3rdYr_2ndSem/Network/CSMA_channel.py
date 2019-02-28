@@ -102,8 +102,8 @@ class Channel:
                         self.sem1.acquire()
                         del self.buffer[0]
                         self.sem1.release()
-                    elif len(self.buffer)!=0:
-                        print(self.buffer)
+                    #elif len(self.buffer)!=0:
+                        #print(self.buffer)
                 except:
                     i-=1
                 #    print("Error")
