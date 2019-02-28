@@ -19,14 +19,14 @@ expr: expr '+' expr
      |ID
      ;
 %% 
-
+int yylex();
 int yyerror(char *s)
 {
 printf("Expression is Invalid\n");
 exit(0);
 }
 
-main()
+int main()
 {
 printf("Enter Expression: ");
 yyparse();

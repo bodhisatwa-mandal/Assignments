@@ -1,5 +1,6 @@
 %{
-#include "y.tab.h"
+#include "y.tab.c"
+extern yyval
 %}
 
 %%
