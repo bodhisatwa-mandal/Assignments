@@ -20,8 +20,8 @@ class Node:
         print("Node", node_id, "Connected to Channel")
         self.can_send = False
 
-        self.frames = ['Hello', 'World' , ' ']
-        self.p = 0.8
+        self.frames = ['Hello', 'World', '#']
+        self.p = 0.15
 
         self.wait_time = random.random()
         self.increment_waitimg_time = random.random()
@@ -39,26 +39,36 @@ class Node:
                     print("Waiting for :",self.wait_time)
                     time.sleep(self.wait_time)
                     self.wait_time += self.wait_time*self.increment_waitimg_time
-                    self.can_send = False
+                    if self.wait_time > 0.5:
+                        self.wait_time = 0.5
+                    #self.can_send = False
             # Channel is Busy
             else:
                 print("Waiting for :",self.wait_time)
                 time.sleep(self.wait_time)
                 self.wait_time += self.wait_time*self.increment_waitimg_time
-                self.can_send = False
+                if self.wait_time > 0.5:
+                    self.wait_time = 0.5
+                #self.can_send = False
 
     def recieveData(self):
         while True:
-            data = self.data_recieve_socket.recv(1024).decode()
-            if data != '':
-                print("Data Recieved : ", data)
+            try:
+                data = self.data_recieve_socket.recv(1024).decode()
+                if data != '':
+                    print("Data Recieved : ", data)
+            except:
+                pass
+
 
     def getChannelInfo(self):
         while True:
             state = self.state_socket.recv(1024).decode()
-            if len(state)>=4 and state[0:4] == "Idle":
+            if state!='' and (state[0] == "I" or int(state[0])==self.node_id):
+                #if state[0]!='I':
+                #    print(state[0])
                 self.can_send = True
-            elif state!='' and int(state) != self.node_id:
+            else:
                 self.can_send = False
 
     def drive(self):
