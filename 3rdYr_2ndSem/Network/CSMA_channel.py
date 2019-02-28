@@ -48,13 +48,14 @@ class Channel:
             print("State Connection", node_index, " Established from : ", node_address)
 
     def channelStatus(self):
-        if len(self.buffer)==0:
-            for state in self.state_list:
-                state.send("Idle".encode())
-        else:
-            print('lol', self.buffer)
-            for state in self.state_list:
-                state.send(self.buffer[0][0].encode())
+        while(True):
+            if len(self.buffer)==0:
+                for state in self.state_list:
+                    state.send("Idle".encode())
+            else:
+                print('lol', self.buffer)
+                for state in self.state_list:
+                    state.send(self.buffer[0][0].encode())
 
     def node_to_buffer(self):
         for node in self.from_node_list:
@@ -64,16 +65,17 @@ class Channel:
                 self.buffer.append(string)
             except:
                 pass
-        self.channelStatus()
+        #self.channelStatus()
 
     def buffer_to_node(self):
         buff_size = len(self.buffer)
         for i in range(buff_size):
-            for node in self.to_node_list:
-                self.node.send(self.buffer[0].encode())
+            #for node in self.to_node_list:
+            #    self.node.send(self.buffer[0].encode())
+            self.to_node_socket.send(self.buffer[0].encode())
             print('hi', self.buffer)
             del self.buffer[0]
-        self.channelStatus()
+        #self.channelStatus()
 
     def start_channel(self):
         thread_1 = threading.Thread(target=self.channelStatus, args=())

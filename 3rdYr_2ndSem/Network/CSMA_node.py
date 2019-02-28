@@ -21,7 +21,7 @@ class Node:
         self.can_send = False
 
         self.frames = ['Hello', 'World' , ' ']
-        self.p = 1.0/num_nodes
+        self.p = 0.8
 
         self.wait_time = random.random()
         self.increment_waitimg_time = random.random()
@@ -32,7 +32,7 @@ class Node:
                 if random.random() <= self.p:
                     for frame in self.frames:
                         print("Sending Frame : ",frame)
-               	        self.sender_client.send((str(self.node_id)+frame).encode())
+               	        self.data_send_socket.send((str(self.node_id)+frame).encode())
                     return
                	# Value does not satisfy p value
                 else:
@@ -50,14 +50,15 @@ class Node:
     def recieveData(self):
         while True:
             data = self.data_recieve_socket.recv(1024).decode()
-            print("Data Recieved : ", data)
+            if data != '':
+                print("Data Recieved : ", data)
 
     def getChannelInfo(self):
         while True:
             state = self.state_socket.recv(1024).decode()
-            if state == "Idle":
+            if len(state)>=4 and state[0:4] == "Idle":
                 self.can_send = True
-            elif int(state) != self.node_id:
+            elif state!='' and int(state) != self.node_id:
                 self.can_send = False
 
     def drive(self):
@@ -67,15 +68,15 @@ class Node:
         thread_1.start()
         thread_2.start()
         thread_3.start()
-        thread_1.join()
-        thread_2.join()
-        thread_3.join()
+        #thread_1.join()
+        #thread_2.join()
+        #thread_3.join()
 #%%
 node_id = int(sys.argv[1])
 num_nodes = int(sys.argv[2])
 node_obj = Node(node_id=node_id, num_nodes=num_nodes)
 #%%
-node.obj.drive()
+node_obj.drive()
 
 
 
