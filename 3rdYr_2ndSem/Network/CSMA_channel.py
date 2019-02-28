@@ -23,12 +23,12 @@ class Channel:
         self.to_node_socket =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.to_node_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.to_node_socket.bind((host, 1235))
-        self.from_node_socket.listen(num_nodes)
+        self.to_node_socket.listen(num_nodes)
 
         self.state_socket =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.state_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.state_socket.bind((host, 1236))
-        self.from_node_socket.listen(num_nodes)
+        self.state_socket.listen(num_nodes)
 
         for node_index in range(num_nodes):
 
@@ -48,12 +48,13 @@ class Channel:
             print("State Connection", node_index, " Established from : ", node_address)
 
     def channelStatus(self):
-        if len(self.buffer)>0:
+        if len(self.buffer)==0:
             for state in self.state_list:
-                self.state.send("Idle".encode())
+                state.send("Idle".encode())
         else:
+            print('lol', self.buffer)
             for state in self.state_list:
-                self.state.send(buffer[0][0].encode())
+                state.send(self.buffer[0][0].encode())
 
     def node_to_buffer(self):
         for node in self.from_node_list:
@@ -66,10 +67,11 @@ class Channel:
         self.channelStatus()
 
     def buffer_to_node(self):
-        buff_size = len(buffer)
+        buff_size = len(self.buffer)
         for i in range(buff_size):
             for node in self.to_node_list:
                 self.node.send(self.buffer[0].encode())
+            print('hi', self.buffer)
             del self.buffer[0]
         self.channelStatus()
 
