@@ -1,7 +1,9 @@
 import sys
 import socket
 import threading
-import asyncio
+import time
+import random
+#import asyncio
 #%%
 class Channel:
     def __init__(self, num_nodes=4, host=socket.gethostname()):
@@ -94,11 +96,14 @@ class Channel:
             buff_size = len(self.buffer)
             for i in range(buff_size):
                 try:
-                    if len(self.buffer)!=0 and self.buffer[-1][-1]=='#':
+                    if len(self.buffer)!=0 :# and self.buffer[-1][-1]=='#':
+                        node_id=0
                         for node in self.to_node_list:
+                            time.sleep(random.random())
                             node.send(self.buffer[0].encode())
                             if self.buffer[0]!='':
-                                print("Sending : ", self.buffer[0])
+                                print("Sending : ", self.buffer[0], "to station : ", node_id)
+                            node_id += 1
                         self.sem1.acquire()
                         del self.buffer[0]
                         self.sem1.release()
@@ -117,9 +122,9 @@ class Channel:
         thread_1.start()
         thread_2.start()
         thread_3.start()
-        #thread_1.join()
-        #thread_2.join()
-        #thread_3.join()
+        thread_1.join()
+        thread_2.join()
+        thread_3.join()
 #%%
 num_nodes = int(sys.argv[1])
 channel_obj = Channel(num_nodes = num_nodes)

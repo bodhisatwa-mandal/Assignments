@@ -22,35 +22,36 @@ class Node:
         self.can_send = False
 
         self.frames = ['Hello', 'World', '#']
-        self.p = 1
-
-        self.wait_time = random.random()
-        self.increment_waitimg_time = random.random()
+        self.p = 1.0/num_nodes
+        self.k = 0
+        self.delay = 0
 
     def sendData(self):
         while True:
             if self.can_send == True:
                 if random.random() <= self.p:
+                    self.delay-=time.time()
                     for frame in self.frames:
+                        time.sleep(random.random())
                         print("Sending Frame : ",frame)
                	        self.data_send_socket.send((str(self.node_id)+frame).encode())
                     return
                	# Value does not satisfy p value
                 else:
-                    print("Waiting for :",self.wait_time)
-                    time.sleep(self.wait_time)
-                    self.wait_time += self.wait_time*self.increment_waitimg_time
-                    if self.wait_time > 0.5:
-                        self.wait_time = 0.5
-                    #self.can_send = False
+                    self.k += 1
+                    waiting_time = random.random()*self.k#(2**self.k - 1)
+                    if waiting_time>1:
+                        waiting_time=1
+                    print("Waiting for :", waiting_time)
+                    time.sleep(waiting_time)
             # Channel is Busy
             else:
-                print("Waiting for :",self.wait_time)
-                time.sleep(self.wait_time)
-                self.wait_time += self.wait_time*self.increment_waitimg_time
-                if self.wait_time > 0.5:
-                    self.wait_time = 0.5
-                #self.can_send = False
+                self.k += 1
+                waiting_time = random.random()*self.k#(2**self.k - 1)
+                if waiting_time > 1:
+                    waiting_time=1
+                print("Waiting for :", waiting_time)
+                time.sleep(waiting_time)
 
     def recieveData(self):
         while True:
@@ -61,11 +62,17 @@ class Node:
                     for ch in range(len(data)):
                         if data[ch].isdigit():
                             if ch!=0:
-                                print("Received Data : ",string)
+                                print("Received Data : ",string[1:],"from station : ",string[0])
+                                if string==str(node_id)+self.frames[-1]:
+                                    self.delay += time.time()
+                                    print("Throughput : ",(11/self.delay),"characters per second")
                             string = str(data[ch])
                         else:
                             string = string+str(data[ch])
-                    print("Received Data : ", string)
+                    print("Received Data : ",string[1:],"from station : ",string[0])
+                    if string==str(node_id)+self.frames[-1]:
+                        self.delay += time.time()
+                        print("Throughput : ",(11/self.delay),"characters per second")
             except Exception as e:
                 print(e)
                 pass
@@ -74,9 +81,7 @@ class Node:
     def getChannelInfo(self):
         while True:
             state = self.state_socket.recv(1024).decode()
-            if state!='' and (state[0] == "I" or int(state[0])==self.node_id):
-                #if state[0]!='I':
-                #    print(state[0])
+            if state!='' and (state[0] == "I"):# or int(state[0])==self.node_id):
                 self.can_send = True
             else:
                 self.can_send = False
@@ -88,9 +93,9 @@ class Node:
         thread_1.start()
         thread_2.start()
         thread_3.start()
-        #thread_1.join()
-        #thread_2.join()
-        #thread_3.join()
+        thread_1.join()
+        thread_2.join()
+        thread_3.join()
 #%%
 node_id = int(sys.argv[1])
 num_nodes = int(sys.argv[2])
