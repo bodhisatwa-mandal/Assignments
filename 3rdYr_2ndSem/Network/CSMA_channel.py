@@ -1,6 +1,9 @@
 import sys
 import socket
 import threading
+import time
+import random
+#import asyncio
 #%%
 class Channel:
     def __init__(self, num_nodes=4, host=socket.gethostname()):
@@ -17,18 +20,18 @@ class Channel:
         self.from_node_socket =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.from_node_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.from_node_socket.bind((host, 1234))
-        self.from_node_socket.settimeout(2)
+        #self.from_node_socket.settimeout(2)
         self.from_node_socket.listen(num_nodes)
 
         self.to_node_socket =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.to_node_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.to_node_socket.bind((host, 1235))
-        self.from_node_socket.listen(num_nodes)
+        self.to_node_socket.listen(num_nodes)
 
         self.state_socket =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.state_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.state_socket.bind((host, 1236))
-        self.from_node_socket.listen(num_nodes)
+        self.state_socket.listen(num_nodes)
 
         for node_index in range(num_nodes):
 
@@ -47,31 +50,70 @@ class Channel:
             self.state_address_list.append(node_address)
             print("State Connection", node_index, " Established from : ", node_address)
 
-    def channelStatus(self):
-        if len(self.buffer)>0:
-            for state in self.state_list:
-                self.state.send("Idle".encode())
-        else:
-            for state in self.state_list:
-                self.state.send(buffer[0][0].encode())
+        self.sem0 = threading.Semaphore()
+        self.sem1 = threading.Semaphore()
 
-    def node_to_buffer(self):
-        for node in self.from_node_list:
+    def channelStatus(self):
+        while(True):
             try:
-                data = node.recv(1024)
-                string = data.decode()
-                self.buffer.append(string)
+                if len(self.buffer)==0:
+                    for state in self.state_list:
+                        state.send("Idle".encode())
+                else:
+                    for state in self.state_list:
+                        state.send(self.buffer[0][0].encode())
             except:
                 pass
-        self.channelStatus()
+
+    def node_to_buffer_helper(self, node):
+        try:
+            data = node.recv(1024)
+            string = data.decode()
+            if string!='':
+                print('Received Data : ',string)
+            self.sem0.acquire()
+            self.buffer += [string]
+            self.sem0.release()
+        except:
+            pass
+
+    def node_to_buffer(self):
+        while True:
+            thread_list = []
+            for node in self.from_node_list:
+                temp_thread = threading.Thread(target=self.node_to_buffer_helper,args=([node]))
+                temp_thread.start()
+                thread_list.append(temp_thread)
+            for temp_thread in thread_list:
+                temp_thread.join()
+
+
+
+            #self.channelStatus()
 
     def buffer_to_node(self):
-        buff_size = len(buffer)
-        for i in range(buff_size):
-            for node in self.to_node_list:
-                self.node.send(self.buffer[0].encode())
-            del self.buffer[0]
-        self.channelStatus()
+        while True:
+            buff_size = len(self.buffer)
+            for i in range(buff_size):
+                try:
+                    if len(self.buffer)!=0 :# and self.buffer[-1][-1]=='#':
+                        node_id=0
+                        for node in self.to_node_list:
+                            time.sleep(random.random())
+                            node.send(self.buffer[0].encode())
+                            if self.buffer[0]!='':
+                                print("Sending : ", self.buffer[0], "to station : ", node_id)
+                            node_id += 1
+                        self.sem1.acquire()
+                        del self.buffer[0]
+                        self.sem1.release()
+                    #elif len(self.buffer)!=0:
+                        #print(self.buffer)
+                except:
+                    i-=1
+                #    print("Error")
+                #    i-=1
+            #self.channelStatus()
 
     def start_channel(self):
         thread_1 = threading.Thread(target=self.channelStatus, args=())

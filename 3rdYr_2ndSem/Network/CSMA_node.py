@@ -3,6 +3,7 @@ import time
 import random
 import threading
 import socket
+import re
 #%%
 class Node:
     def __init__(self, node_id, num_nodes, host=socket.gethostname()):
@@ -20,44 +21,69 @@ class Node:
         print("Node", node_id, "Connected to Channel")
         self.can_send = False
 
-        self.frames = ['Hello', 'World' , ' ']
+        self.frames = ['Hello', 'World', '#']
         self.p = 1.0/num_nodes
-
-        self.wait_time = random.random()
-        self.increment_waitimg_time = random.random()
+        self.k = 0
+        self.delay = 0
 
     def sendData(self):
         while True:
             if self.can_send == True:
                 if random.random() <= self.p:
+                    self.delay-=time.time()
                     for frame in self.frames:
+                        time.sleep(random.random())
                         print("Sending Frame : ",frame)
-               	        self.sender_client.send((str(self.node_id)+frame).encode())
+               	        self.data_send_socket.send((str(self.node_id)+frame).encode())
                     return
                	# Value does not satisfy p value
                 else:
-                    print("Waiting for :",self.wait_time)
-                    time.sleep(self.wait_time)
-                    self.wait_time += self.wait_time*self.increment_waitimg_time
-                    self.can_send = False
+                    self.k += 1
+                    waiting_time = random.random()*self.k#(2**self.k - 1)
+                    if waiting_time>1:
+                        waiting_time=1
+                    print("Waiting for :", waiting_time)
+                    time.sleep(waiting_time)
             # Channel is Busy
             else:
-                print("Waiting for :",self.wait_time)
-                time.sleep(self.wait_time)
-                self.wait_time += self.wait_time*self.increment_waitimg_time
-                self.can_send = False
+                self.k += 1
+                waiting_time = random.random()*self.k#(2**self.k - 1)
+                if waiting_time > 1:
+                    waiting_time=1
+                print("Waiting for :", waiting_time)
+                time.sleep(waiting_time)
 
     def recieveData(self):
         while True:
-            data = self.data_recieve_socket.recv(1024).decode()
-            print("Data Recieved : ", data)
+            try:
+                string = ''
+                data = self.data_recieve_socket.recv(1024).decode()
+                if data != '':
+                    for ch in range(len(data)):
+                        if data[ch].isdigit():
+                            if ch!=0:
+                                print("Received Data : ",string[1:],"from station : ",string[0])
+                                if string==str(node_id)+self.frames[-1]:
+                                    self.delay += time.time()
+                                    print("Throughput : ",(11/self.delay),"characters per second")
+                            string = str(data[ch])
+                        else:
+                            string = string+str(data[ch])
+                    print("Received Data : ",string[1:],"from station : ",string[0])
+                    if string==str(node_id)+self.frames[-1]:
+                        self.delay += time.time()
+                        print("Throughput : ",(11/self.delay),"characters per second")
+            except Exception as e:
+                print(e)
+                pass
+
 
     def getChannelInfo(self):
         while True:
             state = self.state_socket.recv(1024).decode()
-            if state == "Idle":
+            if state!='' and (state[0] == "I"):# or int(state[0])==self.node_id):
                 self.can_send = True
-            elif int(state) != self.node_id:
+            else:
                 self.can_send = False
 
     def drive(self):
@@ -75,7 +101,7 @@ node_id = int(sys.argv[1])
 num_nodes = int(sys.argv[2])
 node_obj = Node(node_id=node_id, num_nodes=num_nodes)
 #%%
-node.obj.drive()
+node_obj.drive()
 
 
 
