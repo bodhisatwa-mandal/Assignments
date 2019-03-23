@@ -1,75 +1,104 @@
 import java.util.*;
 import java.io.*;
-class fstnflw
+class FirstFollow
 {
-	static char ntermnl[],termnl[];
+	static String ntermnl[],termnl[];
 	static int ntlen,tlen;
-	static String grmr[][],fst[],flw[];
+	static String grmr[][][],fst[][],flw[][];
 	public static void main(String args[]) throws IOException
 	{
-		String nt,t;
+
+		String input_file_name = "input.txt";
+		File input_file = new File(input_file_name);
+		BufferedReader br=new BufferedReader(new FileReader(input_file));
+
+		String first_file_name = "first.txt";
+		PrintWriter first_file = new PrintWriter(first_file_name, "UTF-8");
+
+		String follow_file_name = "follow.txt";
+		PrintWriter follow_file = new PrintWriter(follow_file_name, "UTF-8");
+
+		String temp="";
 		int i,j,n;
-		BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
-		System.out.println(“Enter the non-terminals”);
-		nt=br.readLine();
-		ntlen=nt.length();	
-		ntermnl=new char[ntlen];
-		ntermnl=nt.toCharArray();
-		System.out.println(“Enter the terminals”);
-		t=br.readLine();
-		tlen=t.length();
-		termnl=new char[tlen];
-		termnl=t.toCharArray();
-		System.out.println(“Specify the grammar(Enter 9 for epsilon production)”);
-		grmr=new String[ntlen][];
+
+
+		ntermnl=br.readLine().split(" ");
+		ntlen=ntermnl.length;	
+
+		termnl=br.readLine().split(" ");
+		tlen=termnl.length;
+
+
+		grmr=new String[ntlen][][];
 		for(i=0;i<ntlen;i++)
 		{
-			System.out.println(“Enter the number of productions for “+ntermnl[i]);
+
 			n=Integer.parseInt(br.readLine());
-			grmr[i]=new String[n];
-			System.out.println(“Enter the productions”);
+			grmr[i]=new String[n][];
+
 			for(j=0;j<n;j++)
-				grmr[i][j]=br.readLine();
+				grmr[i][j]=br.readLine().split(" ");
 		}
-		fst=new String[ntlen];
+		fst=new String[ntlen][];
 		for(i=0;i<ntlen;i++)
-			fst[i]=first(i);
-		System.out.println(“First Set”);
+		{
+			temp=first(i);
+			fst[i]=temp.split(" ");
+		}
+
 		for(i=0;i<ntlen;i++)
-			System.out.println(removeDuplicates(fst[i]));
-		flw=new String[ntlen];
+		{
+			first_file.print(ntermnl[i]+" : ");
+			fst[i]=removeDuplicates(fst[i]);
+			for(j=0; j<fst[i].length; j++)
+				first_file.print(fst[i][j]+" ");
+			first_file.println();
+		}
+		first_file.close();
+		
+		flw=new String[ntlen][];
 		for(i=0;i<ntlen;i++)
-			flw[i]=follow(i);
-		System.out.println(“Follow Set”);
+		{
+			temp=follow(i);
+			flw[i]=temp.split(" ");
+		}
+
 		for(i=0;i<ntlen;i++)
-			System.out.println(removeDuplicates(flw[i]));
+		{
+			follow_file.print(ntermnl[i]+" : ");
+			flw[i]=removeDuplicates(flw[i]);
+			for(j=0; j<flw[i].length; j++)
+				follow_file.print(flw[i][j]+" ");
+			follow_file.println();
+		}
+		follow_file.close();
 	}
 	static String first(int i)
 	{
 		int j,k,l=0,found=0;
-		String temp=””,str=””;
+		String temp="",str="";
 		for(j=0;j<grmr[i].length;j++) //number of productions
 		{
-			for(k=0;k<grmr[i][j].length();k++,found=0) //when nonterminal has epsilon production
+			for(k=0;k<grmr[i][j].length;k++,found=0) //when nonterminal has epsilon production
 			{
 				for(l=0;l<ntlen;l++) //finding nonterminal
 				{
-					if(grmr[i][j].charAt(k)==ntermnl[l]) //for nonterminal in first set
+					if(grmr[i][j][k].equals(ntermnl[l])) //for nonterminal in first set
 					{
 						str=first(l);
-						if(!(str.length()==1 && str.charAt(0)==’9′)) //when epsilon production is the only nonterminal production
-							temp=temp+str;
+						if(!(str.length()==2 && str.charAt(0)=='#')) //when epsilon production is the only nonterminal production
+							temp=temp+str+" ";
 						found=1;
 						break;
 					}
 				}
 				if(found==1)
 				{
-					if(str.contains(“9″)) //here epsilon will lead to next nonterminal’s first set
+					if(str.contains("#")) //here epsilon will lead to next nonterminal's first set
 						continue;
 				}
 				else //if first set includes terminal
-					temp=temp+grmr[i][j].charAt(k);
+					temp=temp+grmr[i][j][k]+" ";
 				break;
 			}
 		}
@@ -77,73 +106,75 @@ class fstnflw
 	}
 	static String follow(int i)
 	{
-		char pro[],chr[];
-		String temp=””;
+		String pro[],chr[];
+		String temp="";
 		int j,k,l,m,n,found=0;
 		if(i==0)
-			temp=”$”;
+			temp="$ ";
 		for(j=0;j<ntlen;j++)
 		{
 			for(k=0;k<grmr[j].length;k++) //entering grammar matrix
 			{
-				pro=new char[grmr[j][k].length()];
-				pro=grmr[j][k].toCharArray();
+				pro=grmr[j][k];
 				for(l=0;l<pro.length;l++) //entering each production
 				{
-					if(pro[l]==ntermnl[i]) //finding the nonterminal whose follow set is to be found
+					if(pro[l].equals(ntermnl[i])) //finding the nonterminal whose follow set is to be found
 					{
 						if(l==pro.length-1) //if it is the last terminal/non-terminal then follow of current non-terminal
 						{
 							if(j<i)
-								temp=temp+flw[j];
+							{
+								for(int p=0; p<flw[j].length; p++)
+									temp=temp+flw[j][p]+" ";
+							}
 						}
 						else
 						{
 							for(m=0;m<ntlen;m++)
 							{
-								if(pro[l+1]==ntermnl[m]) //first of next non-terminal otherwise (else later…)
+								if(pro[l+1].equals(ntermnl[m])) //first of next non-terminal otherwise (else later…)
 								{
-									chr=new char[fst[m].length()];
-									chr=fst[m].toCharArray();
+									//temp="";
+									//for(int p=0; p<fst[m].length; p++)
+									//	chr+=fst[m][p]+" ";
+									chr=fst[m];
 									for(n=0;n<chr.length;n++)
 									{
-										if(chr[n]==’9′) //if first includes epsilon
+										if(chr[n].equals("#")) //if first includes epsilon
 										{
 											if(l+1==pro.length-1)
-												temp=temp+follow(j); //when non-terminal is second last
+												temp=temp+follow(j)+" "; //when non-terminal is second last
 											else
-												temp=temp+follow(m);
+												temp=temp+follow(m)+" ";
+
 										}
 										else
-											temp=temp+chr[n]; //include whole first set except epsilon
+										{	
+											temp=temp+chr[n]+"+"; //include whole first set except epsilon
+										}
 									}
 									found=1;
 								}
 							}
 							if(found!=1)
-								temp=temp+pro[l+1]; //follow set will include terminal(else is here)
+							{
+								temp=temp+pro[l+1]+" "; //follow set will include terminal(else is here)
+							}
 						}
 					}
 				}
 			}
 		}
+
 		return temp;
 	}
-	static String removeDuplicates(String str)
+	static String[] removeDuplicates(String str[])
 	{
 		int i;
-		char ch;
-		boolean seen[] = new boolean[256];
-		StringBuilder sb = new StringBuilder(seen.length);
-		for(i=0;i<str.length();i++)
-		{
-			ch=str.charAt(i);
-			if (!seen[ch])
-			{
-				seen[ch] = true;
-				sb.append(ch);
-			}
-		}
-		return sb.toString();
+		String temp="";
+		for(i=0; i<str.length; i++)
+			if(temp.indexOf(str[i])==-1)
+				temp = temp+str[i]+" ";
+		return temp.split(" ");
 	}
 }
