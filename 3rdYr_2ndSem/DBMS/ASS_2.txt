@@ -113,12 +113,13 @@ select emp.emp_code, emp.emp_name, emp.basic from emp where emp.basic>=all(selec
 select emp.emp_code, emp.emp_name, emp.basic from emp where emp.basic<=all(select distinct basic from emp);
 
 --16
-select dept_name from department where dept_code in (select dept_code from emp where basic>=all(select distinct basic from emp) );
-
+select dept_name from department where dept_code in (select dept_code from emp where basic>=all(select distinct basic from emp));
+select dept_name from department where dept_code in (select dept_code from emp group by dept_code having avg(basic)>=all(select avg(basic) from emp group by dept_code));
+select dept_code from department where dept_code in (select dept_code from emp group by dept_code having count(*)>all(select distinct count(*) from emp group by dept_code));
 
 --17
-insert into emp01 values
-	('EM121', 'Sukanta Mondal', 'DP001', 'DE007','M','1 Sarcasm Avenue','Gotham City','Metropolis','134711','12345.67','17-FEB-2014');
+insert into emp values
+	('EM224', 'ABCEEF GHIJKL', 'DP001', 'DE007','M','1 Gariahat','New Delhi','Delhi','134711','12345.67','17-FEB-2014');
 
 --18
 delete from emp where desig_code not in (select desig_code from designation);

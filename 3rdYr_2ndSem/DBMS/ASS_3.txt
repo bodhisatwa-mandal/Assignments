@@ -1,32 +1,42 @@
---DROP TABLE LEAVE_REGISTER CASCADE CONSTRAINTS;
---DROP TABLE EMPLOYEE CASCADE CONSTRAINTS;
---DROP TABLE DEPARTMENT CASCADE CONSTRAINTS;
+create table department_ass3(
+	dept_code char(10) primary key,
+	dept_name char(30));
 
-CREATE TABLE DEPARTMENT  
-(  
-DCODE NUMBER(10,0) PRIMARY KEY,  
-DNAME CHAR(20) NOT NULL,  
-NUM_EMP NUMBER(10,0)  
-);
+create table employee_ass3
+	(emp_code char(10) primary key,
+	dept_code char(10),
+	emp_name char(30) constraint upper_case_name check (emp_name=upper(emp_name)),
+	address char(50), 
+	dt_jn date default sysdate,
+	grade char(1) constraint grade_valid check (grade in ('A','B','C')), 
+	basic number(7,2) constraint sal_chk check (basic>= 5000 and basic<=9000),
+	constraint dept_fkey foreign key(dept_code) references department_ass3(dept_code)
+	);
 
-CREATE TABLE EMPLOYEE 
-( 
-ECODE NUMBER(10,0) PRIMARY KEY,
-DCODE NUMBER(10,0), 
-ENAME CHAR(20) NOT NULL CHECK (ENAME=UPPER(ENAME)),
-ADDRESS CHAR(20), 
-CITY CHAR(20), 
-BASIC NUMBER(10,0) CHECK (BASIC>=5000 AND BASIC<=9000), 
-DATE_JOIN DATE DEFAULT SYSDATE,
-GRADE CHAR(1) CHECK (GRADE='A' OR GRADE='B' OR GRADE='C'),
-FOREIGN KEY(DCODE) REFERENCES DEPARTMENT(DCODE)
-);
+create table leave_ass3(
+	emp_code char(10),
+	type char(2) constraint valid_type check(type in('CL','EL','ML')), 
+	from_dt date, to_dt date,
+	foreign key(emp_code) references employee_ass3(emp_code),
+	primary key(emp_code, type)
+	);
 
-CREATE TABLE LEAVE_REGISTER 
-( 
-ECODE NUMBER(10,0), 
-LTYPE CHAR(2) NOT NULL, 
-FROM_DT DATE, 
-TO_DT DATE, 
-FOREIGN KEY(ECODE) REFERENCES EMPLOYEE(ECODE) 
-);
+create table personnel_ass3(
+	emp_code primary key,
+	emp_name,
+	dept_name,
+	basic)
+as select emp_code, emp_name, dept_name, basic from employee_ass3,
+	department_ass3 where employee_ass3.dept_code=department_ass3.dept_code
+	and basic=7000 and department_ass3.dept_code='D3';
+
+insert into personnel_ass3
+	select emp_code, emp_name, dept_name, basic from employee_ass3,
+	department_ass3 where employee_ass3.dept_code=department_ass3.dept_code
+	and basic>=7000
+	and emp_code not in (select distinct emp_code from personnel_ass3);
+
+alter table personnel_ass3 add (net_pay number(9,2));
+update personnel_ass3 set net_pay=1.5*basic;
+alter table personnel_ass3 drop column net_pay;
+
