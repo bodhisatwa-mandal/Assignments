@@ -11,7 +11,7 @@ class Station:
 		self.data_id = 0
 
 	def get_Data(self):
-		self.data = raw_input()
+		self.data = input()
 
 	def send_Data(self):
 		bit = str(self.data)[self.data_id]
@@ -38,7 +38,8 @@ class CDMA:
 		self.bit_len = bit_len
 
 	def generate_Walsh_Code(self):
-		self.walsh_code = hadamard(self.num_stations)
+		self.walsh_code = [[int(bin(x&y),13)%2or-1for x in range(self.num_stations)]for y in range(self.num_stations)]
+		#hadamard(self.num_stations)
 		print("Walsh Code")
 		print(self.walsh_code)
 
@@ -79,9 +80,9 @@ class CDMA:
 				print("Bit Received from Station :", station_index, " : ",sum_code)
 #%%
 print("Enter Number of Stations")
-num_stations = int(raw_input())
+num_stations = int(input())
 print("Enter Bit Length")
-bit_len = 4
+bit_len = int(input())
 cdma = CDMA(num_stations, bit_len)
 cdma.generate_Walsh_Code()
 cdma.create_Stations()
