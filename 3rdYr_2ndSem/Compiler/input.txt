@@ -1,14 +1,4 @@
-S ANT BRULE BNT
-aff d bdg e
-2
-aff
-ANT
-3
-BRULE d ANT
-aff ANT
-EPS
-1
-bdg BNT
-2
-e BNT
-EPS
+S : aff ANT
+ANT : BRULE d ANT | aff ANT | EPS
+BRULE : bdg BNT
+BNT : e BNT | EPS
