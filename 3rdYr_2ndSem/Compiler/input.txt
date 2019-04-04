@@ -1,6 +1,14 @@
-AA BB
-aa bb
+S ANT BRULE BNT
+aff d bdg e
+2
+aff
+ANT
+3
+BRULE d ANT
+aff ANT
+EPS
 1
-aa BB
-1
-bb
+bdg BNT
+2
+e BNT
+EPS
