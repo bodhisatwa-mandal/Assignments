@@ -150,7 +150,7 @@ class FirstFollow
 										}
 										else
 										{	
-											temp=temp+chr[n]+"+"; //include whole first set except epsilon
+											temp=temp+chr[n]+" "; //include whole first set except epsilon
 										}
 									}
 									found=1;

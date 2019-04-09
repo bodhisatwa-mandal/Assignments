@@ -1,6 +1,15 @@
-AA BB
-aa bb
+E E' T T' F
++ * ( ) int
 1
-aa BB
+T E'
+2
++ T E'
+#
 1
-bb
+F T'
+2
+* F T'
+#
+2
+( E )
+int
