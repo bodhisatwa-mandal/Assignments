@@ -1,4 +1,15 @@
-S : aff ANT
-ANT : BRULE d ANT | aff ANT | EPS
-BRULE : bdg BNT
-BNT : e BNT | EPS
+E E' T T' F
++ * id ( )
+1
+T E'
+2
++ T E'
+#
+1
+F T'
+2
+* F T'
+#
+2
+id
+( E )

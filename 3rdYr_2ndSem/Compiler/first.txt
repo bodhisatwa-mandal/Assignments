@@ -1,2 +1,5 @@
-AA : aa 
-BB : bb 
+E : id ( 
+E' : + # 
+T : id ( 
+T' : * # 
+F : id ( 
