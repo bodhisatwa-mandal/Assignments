@@ -1,0 +1,8 @@
+S : aff 
+S : ANT
+ANT : BRULE d ANT 
+ANT : aff ANT
+ANT : EPS
+BRULE : bdg BNT
+BNT : e BNT 
+BNT : EPS

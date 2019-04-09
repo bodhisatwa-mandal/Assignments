@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 E : ( int 
 E' : + # 
 T : ( int 
 T' : * # 
 F : ( int 
+=======
+E : id ( 
+E' : + # 
+T : id ( 
+T' : * # 
+F : id ( 
+>>>>>>> 6a64d9724c4d171efa4ca8c18819d8e82e4c2cf5
