@@ -1,5 +1,5 @@
 E E' T T' F
-+ * id ( )
++ * ( ) int
 1
 T E'
 2
@@ -11,5 +11,5 @@ F T'
 * F T'
 #
 2
-id
 ( E )
+int
