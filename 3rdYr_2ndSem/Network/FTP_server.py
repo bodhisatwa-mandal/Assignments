@@ -1,4 +1,6 @@
 import socket               # Import socket module
+
+print("Enter file name to save");
 filename = str(input())
 s = socket.socket()         # Create a socket object
 host = socket.gethostname() # Get local machine name

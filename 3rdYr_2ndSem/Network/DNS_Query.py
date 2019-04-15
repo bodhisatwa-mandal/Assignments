@@ -1,8 +1,8 @@
 import socket                   # Import socket module
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)             # Create a socket object
-host = "127.0.0.1"
-port = 50000
+host = "172.28.1.149"
+port = 1200
 s.connect((host, port))
 print("Please input domain name to be connected with:")
 d = raw_input()
