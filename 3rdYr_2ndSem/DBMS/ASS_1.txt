@@ -79,7 +79,7 @@ select avg(basic) from emp;
 
 delete from emp where dept_code is null;
 
-select emp_name, basic*0.5+basic*0.4+basic net_pay from emp;
+select emp_name, basic*0.5+basic*0.4+basic as net_pay from emp;
 
 select upper(emp_name), basic from emp order by dept_code asc;
 

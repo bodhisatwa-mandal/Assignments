@@ -61,20 +61,108 @@ insert into emp values('EM004', 'Abc Khan', null, 'DES02','M','Behala','Kolkata'
 insert into emp values('EM005', 'New Name', 'DP003', 'DES03','F','Sarsuna','qwe','rty','8301','3891','1-FEB-2017');
 select * from emp;
 
-set SERVEROUTPUT ON;
+create table leave
+(
+	emp_code char(10),
+	type char(2) constraint valid_type check(type in('CL','EL','ML')), 
+	from_dt date, 
+	to_dt date,
+	foreign key(emp_code) references emp(emp_code),
+	primary key(emp_code, type)
+);
+insert into leave values('EM001','CL','10-FEB-2019','11-FEB-2019');
+insert into leave values('EM003','EL','12-FEB-2019','13-FEB-2019');
+select * from leave;
+
+--1
+set serveroutput on;
 declare
-  name_of_emp emp.emp_name%type;
-  designation_code emp.desig_code%type;
-  ec emp.emp_code%type;
+    name_of_emp emp.emp_name%type;
+    desig_code emp.desig_code%type;
+    code emp.emp_code%type;
 begin
-  ec := '&ec';
-  select emp_name,desig_code into name_of_emp,designation_code from emp where emp_code = ec;
-  dbms_output.put_line(name_of_emp||designation_code);
+    code := 'EM006';
+    select emp_name,desig_code into name_of_emp,desig_code from emp where emp.emp_code=code;
+    dbms_output.put_line(name_of_emp||desig_code);
+exception
+    when no_data_found then
+        dbms_output.put_line('Not Found');
+end;
+
+--2
+declare
+    e_code emp.emp_code%type := 'EM006'; 
+    e_name emp.emp_name%type := 'New Name'; 
+    dep_code emp.dept_code%type := 'HOD'; 
+    des_code emp.desig_code%type := 'DES01'; 
+    gen emp.sex%type := 'M'; 
+    addr emp.address%type := 'Some Address'; 
+    cit emp.city%type := 'Some City'; 
+    sta emp.state%type := 'Some State'; 
+    pi emp.pin%type := 70000; 
+    bas emp.basic%type := 3232; 
+    dt emp.jn_dt%type := '1-FEB-2017'; 
+begin
+    insert into emp values(e_code, e_name, dep_code, des_code, gen, addr, cit, sta, pi, bas, dt);
+    dbms_output.put_line('Success');
+exception
+    when DUP_VAL_ON_INDEX then
+        dbms_output.put_line('Data Duplicacy');
+end;
+
+--3 
+select emp_name from emp order by basic fetch first 10 rows only;
+
+--4
+declare
+    d_code emp.dept_code%type := 'DP000';
+    var_rows number;
+begin
+    delete from emp where dept_code = d_code;
+    if sql%found then
+        var_rows := sql%rowcount;
+        dbms_output.put_line('Rows Deleted :'||var_rows);
+    else
+        dbms_output.put_line('No Rows Deleted');
+    end if;
 end;
 /
+
+--5
+create table ordermast
+(
+    order_no char(5) primary key,
+    order_dt date
+);
+
+create table orderdetails
+(
+    order_no char(5),
+    item_no char(5),
+    qty number,
+    primary key(order_no, item_no)
+);
+
+create table deliverymast
+(
+    delv_no char(5) primary key,
+    order_no char(5),
+    delv_dt date
+);
+
+create table delivery_details
+(
+    delv_no char(5),
+    item_no char(5),
+    qty number,
+    primary key(delv_no, item_no)
+);
+
+declare
+    dt_1 date;
+    dt_2 date;
 
 
 DROP TABLE emp CASCADE CONSTRAINTS;
 DROP TABLE department CASCADE CONSTRAINTS;
 DROP TABLE designation CASCADE CONSTRAINTS;
-
