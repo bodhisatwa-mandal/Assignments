@@ -8,8 +8,8 @@ def main():
 
 
 def start_server():
-    host = "127.0.0.1"
-    port = 50000        # arbitrary non-privileged port
+    host = socket.gethostname()
+    port = 1200        # arbitrary non-privileged port
 
     soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)   # SO_REUSEADDR flag tells the kernel to reuse a local socket in TIME_WAIT state, without waiting for its natural timeout to expire
@@ -34,7 +34,7 @@ def start_server():
             if query in domain:
                 soc.sendto(domain[query], address1)
             else:
-				soc.sendto("404", address1)
+                soc.sendto("404", address1)
         else:
             domain_name = str(data)
             ip1, port1 = str(address1[0]), str(address1[1])

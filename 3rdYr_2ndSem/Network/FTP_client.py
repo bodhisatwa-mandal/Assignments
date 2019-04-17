@@ -4,7 +4,7 @@ print("Enter file name")
 filename = str(input())
 
 s = socket.socket()         # Create a socket object
-host = "192.168.43.160" #socket.gethostname() # Get local machine name
+host = socket.gethostname() # Get local machine name
 port = 12345                 # Reserve a port for your service.
 
 s.connect((host, port))
