@@ -1,18 +1,13 @@
 import socket
 import threading
 import time
+import asyncio
+import websockets
 
 class Server:
 	
 	def __init__(self, num_clients, host='127.0.0.1', port=12345):
 	
-		self.serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		self.serv.bind((host, port))
-		self.serv.listen(num_clients)
-
-		self.client_list = []
-		self.client_address_list = []
 		self.client_dict_list = []
 		self.client_state_list = []
 
@@ -24,21 +19,17 @@ class Server:
 
 	def listen(self):
 
-		while self.connected_clients<self.max_clients:
-			c,addr = self.serv.accept()
-			self.client_list.append(c)
-			self.client_address_list.append(addr)
+		for i in range(self.num_clients)
 			self.client_dict_list.append({})
 			self.client_state_list.append(0)
-			self.connected_clients += 1
-			#print("Connected to client ",c,'at address ',addr)
-			thread = threading.Thread(target=self.receive, args=(self.connected_clients-1,))
-			thread.start()
+			asyncio.get_event_loop().run_until_complete(
+					websockets.serve(self.receive, 'localhost', 12345))
+			asyncio.get_event_loop().run_forever()
 
-	def receive(self, client_id):
-
-		while True:
-			mesg = self.client_list[client_id].recv(self.buffer).decode()
+	async def receive(self, websocket, path):
+		client_id = path-12345
+		async for message in websocket:
+			mesg = await websocket.recv()
 			time.sleep(1)
 			mesg = mesg.split(" ")
 			#print(mesg)
@@ -55,7 +46,7 @@ class Server:
 							#print(self.client_dict_list[j])
 							if mesg[1] in self.client_dict_list[j]:
 								result = self.client_dict_list[j][mesg[1]]
-				self.client_list[client_id].send(result.encode())
+				await websocket.send(result)
 				time.sleep(1)
 			elif mesg[0] == 'exit':
 				self.client_state_list[client_id] = 2
@@ -63,8 +54,7 @@ class Server:
 
 	def main(self):
 
-		thread = threading.Thread(target = self.listen, args=())
-		thread.start()
+		self.listen()
 		while True:
 			print("Enter client id to promote to manager")
 			a = int(input())
@@ -73,8 +63,6 @@ class Server:
 			if a<len(self.client_state_list) and self.client_state_list[a] == 0:
 				self.client_state_list[a]=1
 				print("Done")
-		#thread.raise_exception()
-		thread.join()
 
 server = Server(num_clients=10)
 server.main()
