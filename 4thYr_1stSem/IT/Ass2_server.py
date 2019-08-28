@@ -10,27 +10,31 @@ class Server:
 	
 		self.client_dict_list = []
 		self.client_state_list = []
-
+		self.url = 'ws://'+host+':'
 		self.num_clients = num_clients
-
+		self.main_dict = {}
 
 	def listen(self):
 
 		for i in range(self.num_clients):
+			#print("lol")
 			self.client_dict_list.append({})
 			self.client_state_list.append(0)
-			asyncio.get_event_loop().run_until_complete(
-					websockets.serve(self.receive, 'localhost', 12345+i))
-			asyncio.get_event_loop().run_forever()
+
+		asyncio.get_event_loop().run_until_complete(
+					websockets.serve(self.receive, '127.0.0.1', 12345))
+		asyncio.get_event_loop().run_forever()
 
 	async def receive(self, websocket, path):
-		print(websocket.port)
-		client_id = websocket.port-12345
-		async for message in websocket:
-			mesg = await websocket.recv()
-			time.sleep(1)
+		self.main_dict[(websocket, path)] = len(self.main_dict)
+		#print(self.main_dict)
+		async for mesg in websocket:
+		
+			#mesg = await websocket.recv()
+			#time.sleep(1)
+			client_id = self.main_dict[(websocket, path)]
+
 			mesg = mesg.split(" ")
-			#print(mesg)
 			if mesg[0] == 'put':
 				self.client_dict_list[client_id][mesg[1]] = mesg[2]
 			elif mesg[0] == 'get':
@@ -39,20 +43,21 @@ class Server:
 					if mesg[1] in self.client_dict_list[client_id]:
 						result = self.client_dict_list[client_id][mesg[1]]
 				elif self.client_state_list[client_id] == 1:
-					for j in range(self.connected_clients):
+					for j in range(self.num_clients):
 						if True or self.client_state_list[j] != 2:
 							#print(self.client_dict_list[j])
 							if mesg[1] in self.client_dict_list[j]:
 								result = self.client_dict_list[j][mesg[1]]
+				#async with websockets.connect(self.url+) as websocket:
+	        	#	await websocket.send(mesg)
+				
 				await websocket.send(result)
-				time.sleep(1)
+				#time.sleep(1)
 			elif mesg[0] == 'exit':
 				self.client_state_list[client_id] = 2
 				return
 
-	def main(self):
-
-		self.listen()
+	def promote(self):
 		while True:
 			print("Enter client id to promote to manager")
 			a = int(input())
@@ -62,5 +67,14 @@ class Server:
 				self.client_state_list[a]=1
 				print("Done")
 
-server = Server(num_clients=10)
+	def main(self):
+		#thread_list = []
+		#for i in range(self.num_clients):
+		thread = threading.Thread(target = self.promote, args=())
+		thread.start()
+			#thread_list.append(thread)
+		self.listen()
+		
+		thread.join()
+server = Server(num_clients=4)
 server.main()
