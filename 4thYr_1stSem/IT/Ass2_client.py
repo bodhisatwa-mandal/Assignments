@@ -11,13 +11,14 @@ class Client:
 
 		self.host = host
 		self.port = port+pwd
-		self.url = 'ws://'+host+':'+self.port
+		self.url = 'ws://'+host+':'+str(self.port)
+		self.initial_cmd = initial_cmd
 
-	async def send(mesg):
+	async def send(self, mesg):
 	    async with websockets.connect(self.url) as websocket:
 	        await websocket.send(mesg)
 
-	async def recv():
+	async def recv(self):
 	    async with websockets.connect(self.url) as websocket:
 	        return await websocket.recv()
 
@@ -27,43 +28,52 @@ class Client:
 		while i < len(self.initial_cmd):
 			#print(i, self.initial_cmd[i])
 			if self.initial_cmd[i] == 'exit':
-				self.send('exit')
+				asyncio.get_event_loop().run_until_complete(
+					self.send('exit'))
 				print("Exiting")
 				return
 			if self.initial_cmd[i] == 'get':
 				mesg = self.initial_cmd[i]+" "+self.initial_cmd[i+1]
-				self.send(mesg)
+				asyncio.get_event_loop().run_until_complete(
+					self.send(mesg))
 				time.sleep(1)
 				print("Query sent : "+mesg)
-				mesg = self.recv(self.buffer)
+				mesg = asyncio.get_event_loop().run_until_complete(
+					self.recv())
 				print("Received : ",mesg)
 				time.sleep(1)
 				i += 2
 			elif self.initial_cmd[i] == 'put':
 				mesg = self.initial_cmd[i]+" "+self.initial_cmd[i+1]+" "+self.initial_cmd[i+2]
 				time.sleep(1)
-				self.send(mesg)
+				asyncio.get_event_loop().run_until_complete(
+					self.send(mesg))
 				print("Value put successful")
 				i+=3
 
 		while True:
 			cmd = input().split(" ")
 			if cmd[0] == 'exit':
-				self.send('exit')
+				asyncio.get_event_loop().run_until_complete(
+					self.send('exit'))
 				print("Exiting")
 				return
 			if cmd[0] == 'get':
 				mesg = cmd[0]+" "+cmd[1]
-				self.send(mesg)
+				asyncio.get_event_loop().run_until_complete(
+					self.send(mesg))
 				time.sleep(1)
 				print("Query sent : "+mesg)
-				mesg = self.recv(self.buffer)
+				mesg = asyncio.get_event_loop().run_until_complete(
+					self.recv())
 				print("Received : ",mesg)
 				time.sleep(1)
 			elif cmd[0] == 'put':
 				mesg = cmd[0]+" "+cmd[1]+" "+cmd[2]
 				time.sleep(1)
-				self.send(mesg)
+				print(mesg)
+				asyncio.get_event_loop().run_until_complete(
+					self.send(mesg))
 				print("Value put successful")
 	
 initial_cmd = sys.argv

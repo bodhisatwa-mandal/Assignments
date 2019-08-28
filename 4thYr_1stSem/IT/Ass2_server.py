@@ -11,23 +11,21 @@ class Server:
 		self.client_dict_list = []
 		self.client_state_list = []
 
-		self.max_clients = num_clients
-		self.connected_clients = 0
-
-		self.buffer = 1024
+		self.num_clients = num_clients
 
 
 	def listen(self):
 
-		for i in range(self.num_clients)
+		for i in range(self.num_clients):
 			self.client_dict_list.append({})
 			self.client_state_list.append(0)
 			asyncio.get_event_loop().run_until_complete(
-					websockets.serve(self.receive, 'localhost', 12345))
+					websockets.serve(self.receive, 'localhost', 12345+i))
 			asyncio.get_event_loop().run_forever()
 
 	async def receive(self, websocket, path):
-		client_id = path-12345
+		print(websocket.port)
+		client_id = websocket.port-12345
 		async for message in websocket:
 			mesg = await websocket.recv()
 			time.sleep(1)
